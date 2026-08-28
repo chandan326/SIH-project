@@ -18,7 +18,7 @@ export default function ExplorerPage() {
   const fetchParcels = async () => {
     setLoading(true);
     try {
-      let url = `http://localhost:8000/api/v1/parcels?limit=200`;
+      let url = `/api/parcels?limit=200`;
       if (query) url += `&query=${encodeURIComponent(query)}`;
       if (stateFilter) url += `&state=${encodeURIComponent(stateFilter)}`;
       if (landUseFilter) url += `&land_use=${encodeURIComponent(landUseFilter)}`;
@@ -41,7 +41,7 @@ export default function ExplorerPage() {
 
   const handleSelectParcel = async (parcel: any) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/parcels/${parcel.parcel_uid}`);
+      const res = await fetch(`/api/parcels/${encodeURIComponent(parcel.parcel_uid)}`);
       if (res.ok) {
         const fullDetail = await res.json();
         setSelectedParcel(fullDetail);
@@ -106,10 +106,10 @@ export default function ExplorerPage() {
               className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white focus:outline-none cursor-pointer"
             >
               <option value="">All State Jurisdictions</option>
-              <option value="Maharanya">Maharanya (Pune Region)</option>
-              <option value="Uttar Pradesh Demo">Uttar Pradesh (Lucknow Region)</option>
-              <option value="Karnapur">Karnapur (Bengaluru Region)</option>
-              <option value="Rajasthan Demo">Rajasthan (Jaipur Region)</option>
+              <option value="Maharashtra">Maharashtra (Pune Region)</option>
+              <option value="Uttar Pradesh">Uttar Pradesh (Lucknow Region)</option>
+              <option value="Karnataka">Karnataka (Bengaluru Region)</option>
+              <option value="Rajasthan">Rajasthan (Jaipur Region)</option>
             </select>
           </div>
 

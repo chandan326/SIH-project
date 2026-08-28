@@ -26,15 +26,22 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "bhoomi"
     POSTGRES_PASSWORD: str = "bhoomipass123"
     POSTGRES_DB: str = "bhoomiverify_db"
+    DATABASE_URL_ENV: str = ""
 
     @property
     def DATABASE_URL(self) -> str:
+        raw_url = os.getenv("DATABASE_URL", self.DATABASE_URL_ENV)
+        if raw_url:
+            return raw_url.replace("postgres://", "postgresql+asyncpg://", 1).replace("postgresql://", "postgresql+asyncpg://", 1)
         if self.USE_SQLITE:
             return f"sqlite+aiosqlite:///{SQLITE_DB_PATH}"
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     @property
     def SYNC_DATABASE_URL(self) -> str:
+        raw_url = os.getenv("DATABASE_URL", self.DATABASE_URL_ENV)
+        if raw_url:
+            return raw_url.replace("postgres://", "postgresql://", 1)
         if self.USE_SQLITE:
             return f"sqlite:///{SQLITE_DB_PATH}"
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

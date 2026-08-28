@@ -12,6 +12,7 @@ import {
   Maximize2,
   Minimize2,
   Globe,
+  LocateFixed,
 } from "lucide-react";
 
 interface Parcel {
@@ -57,7 +58,7 @@ export function GoogleMapContainer({ parcels, selectedParcelUid, onSelectParcel 
   const layerGroupRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
 
-  const [tileMode, setTileMode] = useState<"google" | "satellite" | "esri_clarity" | "dark" | "osm">("google");
+  const [tileMode, setTileMode] = useState<"street" | "satellite" | "dark">("street");
   const [showBoundaries, setShowBoundaries] = useState<boolean>(true);
   const [scenarioFilter, setScenarioFilter] = useState<string>("ALL");
   const [isLeafletReady, setIsLeafletReady] = useState(false);
@@ -144,17 +145,13 @@ export function GoogleMapContainer({ parcels, selectedParcelUid, onSelectParcel 
     let attrib = "";
 
     switch (mode) {
-      case "google":
-        url = "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}";
-        attrib = "&copy; Google Maps Hybrid Satellite & Imagery";
+      case "street":
+        url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+        attrib = "&copy; OpenStreetMap contributors";
         break;
       case "satellite":
         url = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
         attrib = "Tiles &copy; Esri &mdash; World Imagery Satellite";
-        break;
-      case "esri_clarity":
-        url = "https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-        attrib = "Tiles &copy; Esri Clarity High-Res Satellite";
         break;
       case "dark":
         url = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
@@ -290,6 +287,14 @@ export function GoogleMapContainer({ parcels, selectedParcelUid, onSelectParcel 
     }
   };
 
+  const locateUser = () => {
+    navigator.geolocation?.getCurrentPosition(
+      ({ coords }) => mapInstanceRef.current?.flyTo([coords.latitude, coords.longitude], 17, { duration: 1.2 }),
+      () => undefined,
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
   return (
     <div className={`transition-all duration-300 ${
       isFullscreen
@@ -330,12 +335,12 @@ export function GoogleMapContainer({ parcels, selectedParcelUid, onSelectParcel 
           {/* Map Tile Mode Selectors */}
           <div className="flex bg-slate-950 rounded-lg p-0.5 border border-slate-800">
             <button
-              onClick={() => setTileMode("google")}
+              onClick={() => setTileMode("street")}
               className={`px-2.5 py-1 rounded text-[11px] font-medium transition-all ${
-                tileMode === "google" ? "bg-amber-500 text-slate-950 font-extrabold" : "text-slate-400 hover:text-white"
+                tileMode === "street" ? "bg-amber-500 text-slate-950 font-extrabold" : "text-slate-400 hover:text-white"
               }`}
             >
-              🌐 Google Map
+              🗺️ Street Map
             </button>
             <button
               onClick={() => setTileMode("satellite")}
@@ -356,6 +361,15 @@ export function GoogleMapContainer({ parcels, selectedParcelUid, onSelectParcel 
           </div>
 
           {/* Direct Google Maps External Tab Launcher */}
+          <button
+            onClick={locateUser}
+            className="px-2.5 py-1 rounded-lg text-xs font-semibold border bg-sky-500/20 hover:bg-sky-500/30 border-sky-500/80 text-sky-300 flex items-center gap-1 transition-all"
+            title="Use my current location"
+          >
+            <LocateFixed className="h-3.5 w-3.5" />
+            <span>My Location</span>
+          </button>
+
           <button
             onClick={openCurrentCenterOnGoogleMaps}
             className="px-2.5 py-1 rounded-lg text-xs font-semibold border bg-amber-500/20 hover:bg-amber-500/30 border-amber-500/80 text-amber-300 flex items-center gap-1 transition-all shadow-md"

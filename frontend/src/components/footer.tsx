@@ -1,10 +1,13 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
+import RelatedWork from "./RelatedWork";
 import Link from "next/link";
 import { Layers, Shield, FileText, CheckCircle2, Lock } from "lucide-react";
 
 export function Footer() {
+  const pathname = usePathname();
   return (
     <footer className="w-full bg-slate-950 border-t border-slate-800/80 text-slate-400 text-xs py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -57,6 +60,7 @@ export function Footer() {
         </div>
 
       </div>
+      {pathname === "/" ? <RelatedWork /> : null}
     </footer>
   );
 }
